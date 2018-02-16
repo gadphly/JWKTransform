@@ -22,9 +22,9 @@ Requires pre-parsing to extract the key parameters from the JWK. In the case of 
 ```
 let key = try RSAKey(n: mod, e: expE, d: expD)
 
-let publicPem = try key.getPublicKey()
+let publicPem = try key.getPublicPEM()
 
-let privatePem = try key.getPrivateKey()
+let privatePem = try key.getPrivatePEM()
 ```
 
 ## What's a JWK

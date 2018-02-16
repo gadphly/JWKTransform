@@ -20,37 +20,19 @@ kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
 5wIDAQAB
 -----END PUBLIC KEY-----\n
 """
-        // expected private key is a truncated version of the original
-        // private key because it is missing a bunch of parameters
-        let expectedPrivateKey = """
------BEGIN PRIVATE KEY-----
-MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzxJXOaQiyWfFi
-avR9r+Lzx9NL9rrAfe03NGMTUzZJQePPQTsgnb7YmOrCx5+7RBxgOcf+iLCcsaf+
-b563DW2gAgLfRR54qKyQzWmpGLpnwtNFkhLdZgdEUaprch9UQF/+yOXGM2p8bzL1
-zh8n+lFgbGnMJuN5ewN5+zTN9JeaVBxYvUzAggMc3RmcByamNKw7OjTA9AZv+fww
-h9P6tSv3RvFyH37nXA4RVdE4TmdCmORb2fpoIQJ7JIMgrSe8guyBcxZQ1begAgXf
-m0r3JpSQbFdU2O75EYkuKmcggNTlqkljyWYpNWbMEyCVjZ+Bek0puBCYwGVQngvV
-fTmpTPDnAgMBAAECggEAQcTVbgv9c4r2hiRNSMKVzMy54FvnXU90/zJ6YPKbtNeX
-ahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q6
-4wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB+crorbMbUZJ/+KTa
-HoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm
-/OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5W
-WbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ
------END PRIVATE KEY-----\n
-"""
+
         do {
             let k = try RSAKey(n: mod, e: expE, d: expD)
         	XCTAssertNotNil(k)
         
-            let publicPem = try k.getPublicKey()
+            let publicPem = try k.getPublicPEM()
             XCTAssertNotNil(publicPem)
 //            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
 
-            let privatePem = try k.getPrivateKey()
+            let privatePem = try k.getPrivatePEM()
             XCTAssertNotNil(privatePem)
 //            print("\n\nprivatePem: \n", privatePem ?? "nil")
-            XCTAssertEqual(publicPem, expectedPrivateKey, "Does not match expected private key")
         } catch {
         	XCTFail()
         }
@@ -65,9 +47,9 @@ WbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ
             let k = try RSAKey(n: mod, e: expE)
             XCTAssertNotNil(k)
             
-            let publicPem = try k.getPublicKey()
+            let publicPem = try k.getPublicPEM()
             XCTAssertNotNil(publicPem)
-            print("\n\nPublic Key (PEM PKCS#8): \n", publicPem ?? "nil")
+//            print("\n\nPublic Key (PEM PKCS#8): \n", publicPem ?? "nil")
             
         } catch {
             XCTFail()

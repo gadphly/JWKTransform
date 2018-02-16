@@ -65,7 +65,7 @@ public class RSAKey {
         }
     }
 
-    public func getPublicKey() throws -> String? {
+    public func getPublicPEM() throws -> String? {
         
         // Public key can be extracted from only private key too
         guard ( type == keyType.publicKey || type == keyType.privateKey )  else {
@@ -93,7 +93,7 @@ public class RSAKey {
         return String(data: pk, encoding: .utf8)
     }
 
-    public func getPrivateKey() throws -> String? {
+    public func getPrivatePEM() throws -> String? {
         
         guard type == keyType.privateKey else {
             throw JWKError.invalidKeyType
@@ -134,8 +134,7 @@ public class RSAKey {
             // at s into a BIGNUM and places it in ret.
             // If ret is NULL, a new BIGNUM is created.
             let bn: UnsafeMutablePointer<BIGNUM> = BN_bin2bn(p.baseAddress, Int32(p.count), nil)
-            BN_print_fp(stdout, bn);
-            print("\n")
+			// BN_print_fp(stdout, bn);
             return bn
         }
     }
