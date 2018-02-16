@@ -31,30 +31,26 @@ public class RSAKey {
     
     public init(n: String, e: String, d: String? = nil) throws {
         
-        
-        guard let key = RSA_new() else {
+        key = RSA_new()
+        guard key != nil  else {
             throw JWKError.opensslInternal
         }
         type = .publicKey
 
         if let d = d {
-            key.pointee.d = try base64URLToBignum(d)
+            key?.pointee.d = try base64URLToBignum(d)
             type = .privateKey
         }
 
-        key.pointee.n = try base64URLToBignum(n)
-        key.pointee.e = try base64URLToBignum(e)
+        key?.pointee.n = try base64URLToBignum(n)
+        key?.pointee.e = try base64URLToBignum(e)
 
-        
-        
 //        #if defined(OPENSSL_1_1_0)
 //            if (1 != RSA_set0_key(rsa, rsaModulusBn, rsaExponentBn, NULL); ERR_print_errors_fp(stdout);
 //                #else
 //                rsa->n = rsaModulusBn;
 //                rsa->e = rsaExponentBn;
 //        #endif
-        
-        
     }
     
     deinit {
@@ -63,68 +59,89 @@ public class RSAKey {
         }
     }
 
-    
-//    public func getPublicKey(_ t: keyFormat) throws -> String {
-        public func getPublicKey() throws -> String {
-
-//        buf = (char *) malloc (2048);
-//
-//        p = buf;
-//
-//        len = i2d_RSAPublicKey (rsa, &p);
-//        len += i2d_RSAPrivateKey (rsa, &p);
+    public func getPublicKey() throws -> String {
         
-        typealias UInt8Ptr = UnsafeMutablePointer<UInt8>?
+        //        buf = (char *) malloc (2048);
+        //
+        //        p = buf;
+        //
+        //        len = i2d_RSAPublicKey (rsa, &p);
+        //        len += i2d_RSAPrivateKey (rsa, &p);
+        
         // get size of PK
         var len = i2d_RSAPublicKey (key, nil)
-        guard len > 0 else {
-            
-            print("i2d_RSAPublicKey failure: \( ERR_get_error())")
-            throw JWKError.createPublicKey
-        }
-
-        let ber: UInt8Ptr = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(len))
-        let throwaway = ber
-        let berPtr = UnsafeMutablePointer<UInt8Ptr>.allocate(capacity: MemoryLayout<UInt8Ptr>.size)
-        berPtr.pointee = throwaway
         
-        // https://www.openssl.org/docs/man1.0.2/crypto/i2d_RSAPublicKey.html
-        //  int i2d_RSAPublicKey(RSA *a, unsigned char **pp);
-        len = i2d_RSAPublicKey (key, berPtr)
-            
         guard len > 0 else {
             
             print("i2d_RSAPublicKey failure: \( ERR_get_error())")
             throw JWKError.createPublicKey
         }
         
-        // make sure we check that our hack doesnt crash our program
-        guard len < 4096 else {
-         	throw JWKError.createPublicKey
-        }
+        var ber: UnsafeMutablePointer<UInt8>? = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(len))
+        // Need to use a throwaway pointer because i2d_RSAPublicKey changes its value (ends up pointing to the end of the value, not the beginning)
+        var throwaway = ber
         
+        // Encode a PKCS#1 RSAPublicKey structure
+        len = i2d_RSAPublicKey (key, &throwaway)
+        
+        guard len > 0 else {
+            print("i2d_RSAPublicKey failure: \( ERR_get_error())")
+            throw JWKError.createPublicKey
+        }
         let pk = Data(bytes: ber!, count: Int(len))
-        print("public key is (", len, ") : \n", pk.hexEncodedString())
-
+        
+        //
         return pk.base64EncodedString()
     }
+
     
-    // Convert from base64URL to Data to BIGNUM
-    private func base64URLToBignum (_ str: String) throws -> UnsafeMutablePointer<BIGNUM> {
-        
-        guard let data = str.base64URLDecode() else {
-            throw JWKError.decoding
+        public func getPrivateKey() throws -> String {
+            
+            // get size of PK
+            var len = i2d_RSAPrivateKey(key, nil)
+            print("key length = ", len)
+            
+            guard len > 0 else {
+                
+                print("i2d_RSAPublicKey failure: \( ERR_get_error())")
+                throw JWKError.createPrivateKey
+            }
+
+            var ber: UnsafeMutablePointer<UInt8>? = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(len))
+            // Need to use a throwaway pointer because i2d_RSAPublicKey changes its value (ends up pointing to the end of the value, not the beginning)
+            var throwaway = ber
+            
+            // Encode a PKCS#1 RSAPrivateKey structure
+            len = i2d_RSAPrivateKey (key, &throwaway)
+
+            guard len > 0 else {
+                print("i2d_RSAPrivateKey failure: \( ERR_get_error())")
+                throw JWKError.createPrivateKey
+            }
+            let pk = Data(bytes: ber!, count: Int(len))
+            
+            //
+            return pk.base64EncodedString()
         }
-        
-        return [UInt8](data).withUnsafeBufferPointer { p in
+    
+        // Convert from base64URL to Data to BIGNUM
+        private func base64URLToBignum (_ str: String) throws -> UnsafeMutablePointer<BIGNUM> {
             
-            // BN_bin2bn() converts the positive integer in big-endian form of length len
-            // at s into a BIGNUM and places it in ret.
-            // If ret is NULL, a new BIGNUM is created.
-            
-            return BN_bin2bn(p.baseAddress, Int32(p.count), nil)
-    	}
-    }
+            guard let data = str.base64URLDecode() else {
+                throw JWKError.decoding
+            }
+            let array = [UInt8](data)
+            return array.withUnsafeBufferPointer { p in
+                
+                // BN_bin2bn() converts the positive integer in big-endian form of length len
+                // at s into a BIGNUM and places it in ret.
+                // If ret is NULL, a new BIGNUM is created.
+                let bn: UnsafeMutablePointer<BIGNUM> = BN_bin2bn(p.baseAddress, Int32(p.count), nil)
+                BN_print_fp(stdout, bn);
+                print("\n")
+                return bn
+            }
+        }
 
 }
 
@@ -139,10 +156,7 @@ public extension String {
         str = str.replacingOccurrences(of: "_", with: "/")
         let d = Data(base64Encoded: str)
         
-//        let d = Data(base64Encoded: str, options: [.ignoreUnknownCharacters])
-        
-        print(d?.hexEncodedString() ?? "nil")
-        
+//        let d = Data(base64Encoded: str, options: [.ignoreUnknownCharacters])        
         return d
     }
     

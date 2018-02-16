@@ -11,6 +11,7 @@ enum JWKError: Error {
     case opensslInternal
     case createKey
     case createPublicKey
+    case createPrivateKey
     case decoding
     case encoding
     case incorrectNumberOfSegments
