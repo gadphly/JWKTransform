@@ -1,18 +1,31 @@
 # JWKTransform
 Library to convert keys of JWK format to more popular formats such as PEM.
+**Right now only works for RSA and outputs PEM PKCS#8 format.**
 
 
 ## Build Instructions
 
 swift build -Xlinker -L/usr/local/opt/openssl/lib -Xcc -I/usr/local/opt/openssl/include
 
-### To build in Xcode:
+#### To build in Xcode:
 swift package generate-xcodeproj
 
 Go to targets -> build settings -> search for user paths add to Header Search Paths /usr/local/opt/openssl/include add to Library Search Paths /usr/local/opt/openssl/lib
 
 ✨ Build magic ✨
 
+
+## Usage
+
+Requires pre-parsing to extract the key parameters from the JWK. In the case of RSA, this means `n`, `e` and `d`. 
+
+```
+let key = try RSAKey(n: mod, e: expE, d: expD)
+
+let publicPem = try key.getPublicKey()
+
+let privatePem = try key.getPrivateKey()
+```
 
 ## What's a JWK
 
