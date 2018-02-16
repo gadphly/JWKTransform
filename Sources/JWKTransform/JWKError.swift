@@ -14,7 +14,7 @@ enum JWKError: Error {
     case createPrivateKey
     case decoding
     case encoding
-    case incorrectNumberOfSegments
+    case invalidKeyType
     case missingAlgorithm
     case signing
     case wrongAlgorithm

@@ -2,39 +2,80 @@ import XCTest
 @testable import JWKTransform
 
 class JWKTransformTests: XCTestCase {
-    func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-        XCTAssertEqual(JWKTransform().text, "Hello, World!")
-    }
 
-
-    func testJWKtoPEM() {
+    func testJWKtoPEM_opensslGenerated() {
         
-//        let expE = "AQAB"
-//        let mod = "AJ-E8O4KJT6So_lUkCIkU0QKW7QjMp9vG7S7vZx0M399idZ4mP7iWWW6OTvjLHpDTx7uapiwRQktDNx3GHigJDmbbu8_VtS5K6J6be1gVrvu6pxmZtrz8PazlH5WYxkuUIfUYpzyfUubZzqzuVWqQO0W9kOhFN7HILAxb1WsQREX-iLg14MGGafrQnJgXHBAwSH0OOJr7v-nRz8AFCAicN8v0uIar9lRA7JRHQCZtpI_lkSGKKBQT1Zae9-9YlWbZlfXErQS1uYoAb3j3uaLbJVO7SNjQqEsRTjYxfpBsTtkvJmwcwA0wV2gBO3JR6K6ep0Y_KyMR8w9Fd_lvJqdltU"
         let expE = "AQAB"
         let mod = "ALPElc5pCLJZ8WJq9H2v4vPH00v2usB97Tc0YxNTNklB489BOyCdvtiY6sLHn7tEHGA5x_6IsJyxp_5vnrcNbaACAt9FHniorJDNaakYumfC00WSEt1mB0RRqmtyH1RAX_7I5cYzanxvMvXOHyf6UWBsacwm43l7A3n7NM30l5pUHFi9TMCCAxzdGZwHJqY0rDs6NMD0Bm_5_DCH0_q1K_dG8XIffudcDhFV0ThOZ0KY5FvZ-mghAnskgyCtJ7yC7IFzFlDVt6ACBd-bSvcmlJBsV1TY7vkRiS4qZyCA1OWqSWPJZik1ZswTIJWNn4F6TSm4EJjAZVCeC9V9OalM8Oc"
         let expD = "QcTVbgv9c4r2hiRNSMKVzMy54FvnXU90_zJ6YPKbtNeXahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q64wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB-crorbMbUZJ_-KTaHoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm_OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5WWbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ"
         
+        let expectedPublicKey = """
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAs8SVzmkIslnxYmr0fa/i
+88fTS/a6wH3tNzRjE1M2SUHjz0E7IJ2+2Jjqwsefu0QcYDnH/oiwnLGn/m+etw1t
+oAIC30UeeKiskM1pqRi6Z8LTRZIS3WYHRFGqa3IfVEBf/sjlxjNqfG8y9c4fJ/pR
+YGxpzCbjeXsDefs0zfSXmlQcWL1MwIIDHN0ZnAcmpjSsOzo0wPQGb/n8MIfT+rUr
+90bxch9+51wOEVXROE5nQpjkW9n6aCECeySDIK0nvILsgXMWUNW3oAIF35tK9yaU
+kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
+5wIDAQAB
+-----END PUBLIC KEY-----\n
+"""
+        // expected private key is a truncated version of the original
+        // private key because it is missing a bunch of parameters
+        let expectedPrivateKey = """
+-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzxJXOaQiyWfFi
+avR9r+Lzx9NL9rrAfe03NGMTUzZJQePPQTsgnb7YmOrCx5+7RBxgOcf+iLCcsaf+
+b563DW2gAgLfRR54qKyQzWmpGLpnwtNFkhLdZgdEUaprch9UQF/+yOXGM2p8bzL1
+zh8n+lFgbGnMJuN5ewN5+zTN9JeaVBxYvUzAggMc3RmcByamNKw7OjTA9AZv+fww
+h9P6tSv3RvFyH37nXA4RVdE4TmdCmORb2fpoIQJ7JIMgrSe8guyBcxZQ1begAgXf
+m0r3JpSQbFdU2O75EYkuKmcggNTlqkljyWYpNWbMEyCVjZ+Bek0puBCYwGVQngvV
+fTmpTPDnAgMBAAECggEAQcTVbgv9c4r2hiRNSMKVzMy54FvnXU90/zJ6YPKbtNeX
+ahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q6
+4wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB+crorbMbUZJ/+KTa
+HoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm
+/OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5W
+WbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ
+-----END PRIVATE KEY-----\n
+"""
         do {
-            var k = try RSAKey(n: mod, e: expE, d: expD)
+            let k = try RSAKey(n: mod, e: expE, d: expD)
         	XCTAssertNotNil(k)
         
-            let publicPemPKCS1 = try k.getPublicKey()
-            print("\n\npublicPemPKCS1: \n",publicPemPKCS1)
-        
-            let privatePemPKCS1 = try k.getPrivateKey()
-            print("\n\nprivatePemPKCS1: \n",privatePemPKCS1)
+            let publicPem = try k.getPublicKey()
+            XCTAssertNotNil(publicPem)
+//            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
+            XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
 
+            let privatePem = try k.getPrivateKey()
+            XCTAssertNotNil(privatePem)
+//            print("\n\nprivatePem: \n", privatePem ?? "nil")
+            XCTAssertEqual(publicPem, expectedPrivateKey, "Does not match expected private key")
         } catch {
         	XCTFail()
         }
     }
-    
+
+    func testJWKtoPEM_appIDGenerated() {
+        
+        let expE = "AQAB"
+        let mod = "AJ-E8O4KJT6So_lUkCIkU0QKW7QjMp9vG7S7vZx0M399idZ4mP7iWWW6OTvjLHpDTx7uapiwRQktDNx3GHigJDmbbu8_VtS5K6J6be1gVrvu6pxmZtrz8PazlH5WYxkuUIfUYpzyfUubZzqzuVWqQO0W9kOhFN7HILAxb1WsQREX-iLg14MGGafrQnJgXHBAwSH0OOJr7v-nRz8AFCAicN8v0uIar9lRA7JRHQCZtpI_lkSGKKBQT1Zae9-9YlWbZlfXErQS1uYoAb3j3uaLbJVO7SNjQqEsRTjYxfpBsTtkvJmwcwA0wV2gBO3JR6K6ep0Y_KyMR8w9Fd_lvJqdltU"
+        
+        do {
+            let k = try RSAKey(n: mod, e: expE)
+            XCTAssertNotNil(k)
+            
+            let publicPem = try k.getPublicKey()
+            XCTAssertNotNil(publicPem)
+            print("\n\nPublic Key (PEM PKCS#8): \n", publicPem ?? "nil")
+            
+        } catch {
+            XCTFail()
+        }
+    }
+
     static var allTests = [
-        ("testExample", testExample),
+        ("testJWKtoPEM_opensslGenerated", testJWKtoPEM_opensslGenerated),
     ]
 }
 
