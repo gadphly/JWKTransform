@@ -18,5 +18,6 @@ enum JWKError: Error {
     case missingAlgorithm
     case signing
     case wrongAlgorithm
+    case input
 }
 

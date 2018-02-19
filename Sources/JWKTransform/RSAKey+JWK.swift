@@ -9,7 +9,7 @@ import Foundation
 import OpenSSL
 
 public class RSAKey {
-
+    
     private var key: UnsafeMutablePointer<EVP_PKEY>? = nil
 
     enum keyType {
@@ -24,17 +24,23 @@ public class RSAKey {
      - parameter e: Base64 URL encoded string representing the `public exponent` of the RSA Key.
      - parameter d: Base64 URL encoded string representing the `private exponent` of the RSA Key.
      */
-    public init(n: String, e: String, d: String? = nil) throws {
+    public init(n: String, e: String, d: String? = nil, p: String? = nil, q: String? = nil) throws {
         
         let rsakey = RSA_new()
         guard rsakey != nil  else {
             throw JWKError.opensslInternal
         }
         type = .publicKey
-
+        
         if let d = d {
             rsakey?.pointee.d = try base64URLToBignum(d)
             type = .privateKey
+        }
+        if let p = p {
+            rsakey?.pointee.p = try base64URLToBignum(p)
+        }
+        if let q = q {
+            rsakey?.pointee.q = try base64URLToBignum(q)
         }
 
         rsakey?.pointee.n = try base64URLToBignum(n)
@@ -49,7 +55,27 @@ public class RSAKey {
         guard key != nil else {
             throw JWKError.createKey
         }
+    }
 
+    public convenience init(jwk: String) throws {
+
+        if let jwkData = jwk.data(using: .utf8) {
+            let jwkJSON = try? JSONDecoder().decode(JWK.self, from: jwkData)
+            
+            guard jwkJSON?.kty == "RSA", let modulus = jwkJSON?.n, let exp = jwkJSON?.e else {
+                throw JWKError.input
+            }
+
+            if let privExp = jwkJSON?.d {
+                try self.init(n: modulus, e: exp, d: privExp)
+            } else {
+                try self.init(n: modulus, e: exp)
+            }
+        } else {
+            throw JWKError.input
+        }
+    }
+    
 
 //        #if defined(OPENSSL_1_1_0)
 //            if (1 != RSA_set0_key(rsa, rsaModulusBn, rsaExponentBn, NULL); ERR_print_errors_fp(stdout);
@@ -57,7 +83,6 @@ public class RSAKey {
 //                rsa->n = rsaModulusBn;
 //                rsa->e = rsaExponentBn;
 //        #endif
-    }
     
     deinit {
         if let key = key {
@@ -67,7 +92,7 @@ public class RSAKey {
 
     public func getPublicPEM() throws -> String? {
         
-        // Public key can be extracted from only private key too
+        // Public key can be extracted from both public and private keys
         guard ( type == keyType.publicKey || type == keyType.privateKey )  else {
             throw JWKError.invalidKeyType
         }
@@ -77,7 +102,7 @@ public class RSAKey {
         // writes EVP key to bio
         let  retval = PEM_write_bio_PUBKEY(bio, key)
         
-        // get buffer length
+        // get length of BIO that was created
         // BIO_PENDING is complex macro
         let publicKeyLen = BIO_ctrl(bio, BIO_CTRL_PENDING, 0, nil)
 
@@ -104,7 +129,7 @@ public class RSAKey {
         // writes EVP key to bio
         let  retval = PEM_write_bio_PrivateKey(bio, key, nil, nil, 0, nil, nil);
         
-        // get buffer length
+        // get length of BIO that was created
         // BIO_PENDING is complex macro
         let publicKeyLen = BIO_ctrl(bio, BIO_CTRL_PENDING, 0, nil)
         
@@ -138,41 +163,5 @@ public class RSAKey {
             return bn
         }
     }
-}
-
-public extension String {
-    public func base64URLDecode() -> Data? {
-        var str = self
-        
-        // add padding if necessary
-        str = str.padding(toLength: ((str.count+3)/4)*4, withPad: "=", startingAt: 0)
-
-        // URL decode
-        str = str.replacingOccurrences(of: "-", with: "+")
-        str = str.replacingOccurrences(of: "_", with: "/")
-        let d = Data(base64Encoded: str)
-        
-        return d
-    }
-    
-}
-
-extension Data {
-    func hexEncodedString() -> String {
-        return map { String(format: "%02hhx", $0) }.joined()
-    }
-    
-    public func base64URLEncode() -> String {
-        let d = self
-        // base64 encoding
-        var str = d.base64EncodedString()
-
-        // URL encode
-        str = str.replacingOccurrences(of: "+", with: "-")
-        str = str.replacingOccurrences(of: "/", with: "_")
-
-        return str
-    }
-
 }
 

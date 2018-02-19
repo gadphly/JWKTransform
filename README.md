@@ -17,15 +17,26 @@ Go to targets -> build settings -> search for user paths add to Header Search Pa
 
 ## Usage
 
-Requires pre-parsing to extract the key parameters from the JWK. In the case of RSA, this means `n`, `e` and `d`. 
+Can use either the JWK string or the JWK RSA components as initializer input.
 
+```
+let key = try RSAKey(token: jwk)
+
+```
+or
 ```
 let key = try RSAKey(n: mod, e: expE, d: expD)
+```
+
+Once initialized, can extract public and private keys as PEM format using PKCS#8 encoding.
+```
+let key = try RSAKey(token: jwk)
 
 let publicPem = try key.getPublicPEM()
-
 let privatePem = try key.getPrivatePEM()
 ```
+
+Note that the above should provide the public key that was originally produced. The private key however has fields such as `p`, `q`, etc. that are optional, therefore the produced private key might not be an exact match to the original.
 
 ## What's a JWK
 
