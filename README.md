@@ -31,8 +31,8 @@ Once initialized, can extract public and private keys as PEM format using PKCS#8
 ```
 let key = try RSAKey(jwk: token)
 
-let publicPem = try key.getPublicPEM()
-let privatePem = try key.getPrivatePEM()
+let publicPem = try key.getPublicKey(certEncoding.pemPkcs8)
+let privatePem = try key.getPublicKey(certEncoding.pemPkcs8)
 ```
 
 Note that the above should provide the public key that was originally produced. The private key however has fields such as `p`, `q`, etc. that are optional, therefore the produced private key might not be an exact match to the original.
@@ -41,12 +41,12 @@ Note that the above should provide the public key that was originally produced. 
 
 JSON Web Key (JWK) defined in https://tools.ietf.org/html/rfc7517
 
-Example JWK Set (JWKS):
+Example JWK:
 
 ```
 {
+	"kty": "RSA",			// key type
 	"alg": "RS256",     	// algorithm for the key
-	"kty": "RSA",        	// key type
 	"use": "sig",        	// how the key is meant to be used. For this example, sig represents signature.
 	"x5c": [            	// x.509 certificate chain
 	"MIIC+DCCAe..="

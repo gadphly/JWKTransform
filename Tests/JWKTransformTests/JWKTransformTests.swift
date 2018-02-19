@@ -28,7 +28,7 @@ kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
             let k = try RSAKey(jwk: token)
             XCTAssertNotNil(k)
             
-            let publicPem = try k.getPublicPEM()
+            let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
             print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
@@ -62,12 +62,12 @@ kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
             let k = try RSAKey(n: mod, e: expE, d: expD)
         	XCTAssertNotNil(k)
         
-            let publicPem = try k.getPublicPEM()
+            let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
 //            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
 
-            let privatePem = try k.getPrivatePEM()
+            let privatePem = try k.getPrivateKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(privatePem)
 //            print("\n\nprivatePem: \n", privatePem ?? "nil")
         } catch {
@@ -99,7 +99,7 @@ lU7tI2NCoSxFONjF+kGxO2S8mbBzADTBXaAE7clHorp6nRj8rIxHzD0V3+W8mp2W
             let k = try RSAKey(jwk: token)
             XCTAssertNotNil(k)
             
-            let publicPem = try k.getPublicPEM()
+            let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
             print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
@@ -130,7 +130,7 @@ lU7tI2NCoSxFONjF+kGxO2S8mbBzADTBXaAE7clHorp6nRj8rIxHzD0V3+W8mp2W
             let k = try RSAKey(n: mod, e: expE)
             XCTAssertNotNil(k)
             
-            let publicPem = try k.getPublicPEM()
+            let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
 //            print("\n\nPublic Key (PEM PKCS#8): \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")

@@ -16,7 +16,7 @@ public class RSAKey {
         case privateKey
         case publicKey
     }
-    
+
     private var type: keyType
     
     /**
@@ -89,8 +89,29 @@ public class RSAKey {
             EVP_PKEY_free(key)
         }
     }
+    public func getPublicKey(_ encoding: certEncoding? = certEncoding.pemPkcs8) throws -> String? {
 
-    public func getPublicPEM() throws -> String? {
+        // currently only support PEM PKCS#8
+        guard encoding == certEncoding.pemPkcs8 else {
+            throw JWKError.invalidKeyType
+        }
+        
+        // PEM PKCS#8
+        return try getPublicPEM()
+    }
+
+    public func getPrivateKey(_ encoding: certEncoding? = certEncoding.pemPkcs8) throws -> String? {
+        
+        // currently only support PEM PKCS#8
+        guard encoding == certEncoding.pemPkcs8 else {
+            throw JWKError.invalidKeyType
+        }
+        
+        // PEM PKCS#8
+        return try getPublicPEM()
+    }
+
+    private func getPublicPEM() throws -> String? {
         
         // Public key can be extracted from both public and private keys
         guard ( type == keyType.publicKey || type == keyType.privateKey )  else {
@@ -118,7 +139,7 @@ public class RSAKey {
         return String(data: pk, encoding: .utf8)
     }
 
-    public func getPrivatePEM() throws -> String? {
+    private func getPrivatePEM() throws -> String? {
         
         guard type == keyType.privateKey else {
             throw JWKError.invalidKeyType
