@@ -23,29 +23,48 @@ public class RSAKey {
      - parameter n: Base64 URL encoded string representing the `modulus` of the RSA Key.
      - parameter e: Base64 URL encoded string representing the `public exponent` of the RSA Key.
      - parameter d: Base64 URL encoded string representing the `private exponent` of the RSA Key.
+     - parameter p: Base64 URL encoded string representing the `secret prime factor` of the RSA Key.
+     - parameter q: Base64 URL encoded string representing the `secret prime factor` of the RSA Key.
+     - parameter dp: Base64 URL encoded string representing the `first factor CRT exponent` of the RSA Key. `d mod (p-1)`
+     - parameter dq: Base64 URL encoded string representing the `second factor CRT exponent` of the RSA Key. `d mod (q-1)`
+     - parameter qi: Base64 URL encoded string representing the `first CRT coefficient` of the RSA Key. `q^-1 mod p`
      */
-    public init(n: String, e: String, d: String? = nil, p: String? = nil, q: String? = nil) throws {
+    public init(n: String, e: String, d: String? = nil,
+                p: String? = nil, q: String? = nil,
+                dp: String? = nil, dq: String? = nil,
+                qi: String? = nil) throws {
         
         let rsakey = RSA_new()
         guard rsakey != nil  else {
             throw JWKError.opensslInternal
         }
         type = .publicKey
-        
+        rsakey?.pointee.n = try base64URLToBignum(n)
+        rsakey?.pointee.e = try base64URLToBignum(e)
+
         if let d = d {
             rsakey?.pointee.d = try base64URLToBignum(d)
             type = .privateKey
         }
+        
+        // p, q, dmp1, dmq1 and iqmp may be NULL in private keys,
+        // but the RSA operations are much faster when these values are available.
         if let p = p {
             rsakey?.pointee.p = try base64URLToBignum(p)
         }
         if let q = q {
             rsakey?.pointee.q = try base64URLToBignum(q)
         }
+        if let dq = dq {
+            rsakey?.pointee.dmq1 = try base64URLToBignum(dq)
+        }
+        if let dp = dp {
+            rsakey?.pointee.dmp1 = try base64URLToBignum(dp)
+        }
+        if let qi = qi {
+            rsakey?.pointee.iqmp = try base64URLToBignum(qi)
+        }
 
-        rsakey?.pointee.n = try base64URLToBignum(n)
-        rsakey?.pointee.e = try base64URLToBignum(e)
-        
         // assign RSAkey to EVP_Pkey to keep
         // EVP_PKEY_assign_RSA but complex macro
         // EVP_PKEY_assign((pkey),EVP_PKEY_RSA,(char *)(rsa))
@@ -62,20 +81,17 @@ public class RSAKey {
         if let jwkData = jwk.data(using: .utf8) {
             let jwkJSON = try? JSONDecoder().decode(JWK.self, from: jwkData)
             
+            // Check presence of mandatory fields
             guard jwkJSON?.kty == "RSA", let modulus = jwkJSON?.n, let exp = jwkJSON?.e else {
                 throw JWKError.input
             }
 
-            if let privExp = jwkJSON?.d {
-                try self.init(n: modulus, e: exp, d: privExp)
-            } else {
-                try self.init(n: modulus, e: exp)
-            }
+            try self.init(n: modulus, e: exp, d: jwkJSON?.d, p: jwkJSON?.p, q: jwkJSON?.q, dp: jwkJSON?.dp, dq: jwkJSON?.dq, qi: jwkJSON?.qi)
+            
         } else {
             throw JWKError.input
         }
     }
-    
 
 //        #if defined(OPENSSL_1_1_0)
 //            if (1 != RSA_set0_key(rsa, rsaModulusBn, rsaExponentBn, NULL); ERR_print_errors_fp(stdout);
@@ -108,7 +124,7 @@ public class RSAKey {
         }
         
         // PEM PKCS#8
-        return try getPublicPEM()
+        return try getPrivatePEM()
     }
 
     private func getPublicPEM() throws -> String? {

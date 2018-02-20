@@ -9,7 +9,12 @@ class JWKTransformTests: XCTestCase {
     "kty": "RSA",
     "n": "ALPElc5pCLJZ8WJq9H2v4vPH00v2usB97Tc0YxNTNklB489BOyCdvtiY6sLHn7tEHGA5x_6IsJyxp_5vnrcNbaACAt9FHniorJDNaakYumfC00WSEt1mB0RRqmtyH1RAX_7I5cYzanxvMvXOHyf6UWBsacwm43l7A3n7NM30l5pUHFi9TMCCAxzdGZwHJqY0rDs6NMD0Bm_5_DCH0_q1K_dG8XIffudcDhFV0ThOZ0KY5FvZ-mghAnskgyCtJ7yC7IFzFlDVt6ACBd-bSvcmlJBsV1TY7vkRiS4qZyCA1OWqSWPJZik1ZswTIJWNn4F6TSm4EJjAZVCeC9V9OalM8Oc",
     "e":"AQAB",
-	"d":"QcTVbgv9c4r2hiRNSMKVzMy54FvnXU90_zJ6YPKbtNeXahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q64wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB-crorbMbUZJ_-KTaHoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm_OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5WWbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ"
+	"d":"QcTVbgv9c4r2hiRNSMKVzMy54FvnXU90_zJ6YPKbtNeXahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q64wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB-crorbMbUZJ_-KTaHoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm_OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5WWbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQ",
+    "p":"AN3iQAHGt2PRITXNEDo0y8aHkZgvb9V-V3VQ0uNF7A5nDGL11431K2YEq0GvB5uJf25ISSTG2nMaGkGqFScg7AVOktkouId0gvEWrVHIBDNfEWVQC0gmVAQZJbyIbitxNOI1XqFp3eMvMeGrZTeSBf0OfqstP_J0ybhispMhr_HP",
+    "q":"AM9ok9apT18nNjoeJweWbbneBGncD_eZiMSutMo6lma-IotkjH5DFN1BPwHexbi16EAlkDrdeTPmn8N6twvT5Faa3ZtWRB6gW-tM669DgPPPLwA77ZwdbOV7YLmujVW-TC4MeqYcEGkXY-BAn49MGF9CFDwhZky8uujYrzA0gM1p",
+    "dp":"H2luYlH9mHX8258CUxsyVhLPO9pLXNAcFZGxqVc2yfswt7nSIFi7IiA7Fntu-kgG8FfvcvNr7aueV_l6MSXqA_5Rr8iiBxsphnQNaWyFm7gzwEIKttYmQsZEn2I5JpFKSVQA550TOpxt1WLsW2eizWaF7Dnlua9q912Rpl64h-U",
+    "dq":"AIw5U9pJVZQrWoooYJLMrRqAc9NuKI1pjAINa8VdntmPqqM7M5EZoT2FIygMiPi8Y20a-EwT-CGSxmjOynqAo1u6ECE5TYy3Ne37b0xrAv_TDx_FZHurmTf9FgPzczKJGc_4N-OeDao_WhL_HeEvvTqJ3kxY-GThJCzQcoDQvlQh",
+    "qi":"Y5o3dg_DFtdZn2hNURsm5veC_pAjFSxVmJyc5Qd0dOOv2NjOWjlcux7Q7EtaOhGa_hp0Q-dzc1oMg-WnMnIHoiJjdWYFxdGAWDN4JKPl_71k2kjWMRvL_jm_N8RUUK9EvEK8FPvJb0U5fL6L79JDIuM1CcUQWjspEtBIKCsDPqk"
 }
 """
         let expectedPublicKey = """
@@ -23,6 +28,36 @@ kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
 5wIDAQAB
 -----END PUBLIC KEY-----\n
 """
+        let expectedPrivateKey = """
+-----BEGIN PRIVATE KEY-----
+MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzxJXOaQiyWfFi
+avR9r+Lzx9NL9rrAfe03NGMTUzZJQePPQTsgnb7YmOrCx5+7RBxgOcf+iLCcsaf+
+b563DW2gAgLfRR54qKyQzWmpGLpnwtNFkhLdZgdEUaprch9UQF/+yOXGM2p8bzL1
+zh8n+lFgbGnMJuN5ewN5+zTN9JeaVBxYvUzAggMc3RmcByamNKw7OjTA9AZv+fww
+h9P6tSv3RvFyH37nXA4RVdE4TmdCmORb2fpoIQJ7JIMgrSe8guyBcxZQ1begAgXf
+m0r3JpSQbFdU2O75EYkuKmcggNTlqkljyWYpNWbMEyCVjZ+Bek0puBCYwGVQngvV
+fTmpTPDnAgMBAAECggEAQcTVbgv9c4r2hiRNSMKVzMy54FvnXU90/zJ6YPKbtNeX
+ahcac8disEnZ8eMo7FFx9D6Pje8idmGE7dCWh7AxAE5cEKVwDYLgh6WvV39Fi3q6
+4wQbRMb0N6mNKPw6vA9FT6jeb9IVzmq8gTOlMHIjXZysZFWB+crorbMbUZJ/+KTa
+HoPf2yYMhJAmUhrtRrSICASnzL010aay5kyAx0pQmrLQRtl8jtYjLqMt1Eie1Rcm
+/OlZtfMm2bWmXAWkaH9K6WJlI6pAAeCeZ9FKjBumMjmTnwNgx480pPhWxojR5J5W
+WbVI8EGuUVJZ1LrNT47uofM3lPXWJqCc4L7VXni9MQKBgQDd4kABxrdj0SE1zRA6
+NMvGh5GYL2/Vfld1UNLjRewOZwxi9deN9StmBKtBrwebiX9uSEkkxtpzGhpBqhUn
+IOwFTpLZKLiHdILxFq1RyAQzXxFlUAtIJlQEGSW8iG4rcTTiNV6had3jLzHhq2U3
+kgX9Dn6rLT/ydMm4YrKTIa/xzwKBgQDPaJPWqU9fJzY6HicHlm253gRp3A/3mYjE
+rrTKOpZmviKLZIx+QxTdQT8B3sW4tehAJZA63Xkz5p/DercL0+RWmt2bVkQeoFvr
+TOuvQ4Dzzy8AO+2cHWzle2C5ro1VvkwuDHqmHBBpF2PgQJ+PTBhfQhQ8IWZMvLro
+2K8wNIDNaQKBgB9pbmJR/Zh1/NufAlMbMlYSzzvaS1zQHBWRsalXNsn7MLe50iBY
+uyIgOxZ7bvpIBvBX73Lza+2rnlf5ejEl6gP+Ua/IogcbKYZ0DWlshZu4M8BCCrbW
+JkLGRJ9iOSaRSklUAOedEzqcbdVi7Ftnos1mhew55bmvavddkaZeuIflAoGBAIw5
+U9pJVZQrWoooYJLMrRqAc9NuKI1pjAINa8VdntmPqqM7M5EZoT2FIygMiPi8Y20a
++EwT+CGSxmjOynqAo1u6ECE5TYy3Ne37b0xrAv/TDx/FZHurmTf9FgPzczKJGc/4
+N+OeDao/WhL/HeEvvTqJ3kxY+GThJCzQcoDQvlQhAoGAY5o3dg/DFtdZn2hNURsm
+5veC/pAjFSxVmJyc5Qd0dOOv2NjOWjlcux7Q7EtaOhGa/hp0Q+dzc1oMg+WnMnIH
+oiJjdWYFxdGAWDN4JKPl/71k2kjWMRvL/jm/N8RUUK9EvEK8FPvJb0U5fL6L79JD
+IuM1CcUQWjspEtBIKCsDPqk=
+-----END PRIVATE KEY-----\n
+"""
         
         do {
             let k = try RSAKey(jwk: token)
@@ -30,9 +65,13 @@ kGxXVNju+RGJLipnIIDU5apJY8lmKTVmzBMglY2fgXpNKbgQmMBlUJ4L1X05qUzw
             
             let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
-            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
+//            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
             
+            let privatePem = try k.getPrivateKey(certEncoding.pemPkcs8)
+            XCTAssertNotNil(privatePem)
+//            print("\n\n*** privatePem: \n", privatePem ?? "nil")
+            XCTAssertEqual(privatePem, expectedPrivateKey, "Does not match expected private key")
         } catch {
             XCTFail()
         }
@@ -101,7 +140,7 @@ lU7tI2NCoSxFONjF+kGxO2S8mbBzADTBXaAE7clHorp6nRj8rIxHzD0V3+W8mp2W
             
             let publicPem = try k.getPublicKey(certEncoding.pemPkcs8)
             XCTAssertNotNil(publicPem)
-            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
+//            print("\n\npublicPemPKCS1: \n", publicPem ?? "nil")
             XCTAssertEqual(publicPem, expectedPublicKey, "Does not match expected public key")
             
         } catch {
@@ -141,7 +180,10 @@ lU7tI2NCoSxFONjF+kGxO2S8mbBzADTBXaAE7clHorp6nRj8rIxHzD0V3+W8mp2W
     }
 
     static var allTests = [
+        ("testJWKtoPEM_OpenSSLGenerated", testJWKtoPEM_OpenSSLGenerated),
         ("testJWKFieldstoPEM_opensslGenerated", testJWKFieldstoPEM_opensslGenerated),
+        ("testJWKtoPEM_appIDGenerated", testJWKtoPEM_appIDGenerated),
+        ("testJWKFieldstoPEM_appIDGenerated", testJWKFieldstoPEM_appIDGenerated),
     ]
 }
 
